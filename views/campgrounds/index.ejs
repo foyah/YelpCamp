@@ -1,0 +1,33 @@
+    <!-- Dans ce template ejs je récupère les différents titres et _ids (Mongo) des emplacements que j'ai obtenu grâce à ma query  -->
+    <!-- "const campgrounds = await Campground.find({})"" -->
+    <!-- Dans ce fichier, j'affiche tous les camps sous forme de liens dans une liste -->
+
+    <% layout('/layouts/boilerplate') %> 
+
+    <h1>All Campgrounds</h1>
+    <div>
+        <a href="/campgrounds/new">Add campground</a>
+    </div> 
+
+        <% for(let campground of campgrounds) {%>
+            <div class="card" mb-3>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img class="img-fluid" src="<%=campground.image%> " alt="">
+                    </div>
+                    <div class="col-mg-8">
+                        <div class="card-body">
+                            <h5 class="card-title"><%=campground.title%></h5>
+                            <p class="card-text"><%=campground.description%> </p>
+                            <p class="card-text"><small class="text-muted"><%=campground.location%></small></p>
+                            <a href="campgrounds/<%=campground._id%>" class="btn btn-primary">View <%=campground.title%></a>
+                        </div>
+                        <%}%> 
+                    </div>
+                </div>
+            </div>
+
+    <!-- Je n'arrivais pas à afficher la bonne route car la balise a, part de la page courante, pas besoin de respécifier tout le chemin -->
+    <!-- campgrounds/campground._id (ejs) // -->
+    <!-- EDIT : C'EST APPAREMENT FAUX PUISQUE ÇA MARCHE COMME TEL -->
+
