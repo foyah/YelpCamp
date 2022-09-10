@@ -3,11 +3,15 @@ const express = require('express');
 const methodOverride = require('method-override');
 const catchAsync = require('./helpers/catchAsync');
 const morgan = require('morgan');
-const { campgroundSchema } = require('./joiSchemas');
+const { campgroundSchema, reviewSchema } = require('./joiSchemas');
 const ExpressError = require('./helpers/ExpressError');
 const ejsMate = require('ejs-mate');
 const Campground = require('./models/campground');
 const mongoose = require('mongoose');
+const Review = require('./models/review');
+
+
+
 mongoose.connect('mongodb://localhost:27017/yelpCamp', {
     useNewUrlParser: true
 });
@@ -30,6 +34,16 @@ app.use(methodOverride('_method'));
 
 const validateCampground = (req,res,next) => {
     const {error} = campgroundSchema.validate(req.body)
+    if(error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 420)
+    } else {
+        next();
+    }
+}
+
+const validateReview = (req,res,next) => {
+    const {error} = reviewSchema.validate(req.body)
     if(error) {
         const msg = error.details.map(el => el.message).join(',')
         throw new ExpressError(msg, 420)
@@ -68,14 +82,8 @@ app.put('/campgrounds/:_id', validateCampground, catchAsync(async (req, re, next
     res.redirect(`/campgrounds/${campground._id}`) 
 }));
 
-app.delete('/campgrounds/:_id', catchAsync(async (req,res, next) => { // Route qui permet de supprimer de la donnée
-    const { _id } = req.params
-    const campgrounds = await Campground.findByIdAndDelete(_id)
-    res.redirect('/campgrounds');
-}));
-
 app.get('/campgrounds/:_id', catchAsync(async (req,res, next) => {
-    const campgrounds = await Campground.findById(req.params._id) // j'identifie le camp via son ID et l'affiche
+    const campgrounds = await Campground.findById(req.params._id).populate('reviews'); // j'identifie le camp via son ID et l'affiche
     res.render('campgrounds/show', {campgrounds})
 }));
 
@@ -83,6 +91,28 @@ app.get('/campgrounds/:_id/edit', catchAsync(async (req,res, next) => {
     const campgrounds = await Campground.findById(req.params._id);
     res.render('campgrounds/edit', {campgrounds})
 }));
+app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async (req,res) => { // La route ne fonctionnait pas car j'avais oublié le : devant reviewId
+const {id, reviewId} = req.params;                                           // Les commentaires ne se supprimaient pas.
+    const campgrounds = await Campground.findByIdAndUpdate(id, {$pull : { reviews : reviewId}});
+    const review = await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrounds/${id}`);
+}))
+
+app.delete('/campgrounds/:_id', catchAsync(async (req,res, next) => { // Route qui permet de supprimer de la donnée
+    const { _id } = req.params
+    const campgrounds = await Campground.findByIdAndDelete(_id)
+    res.redirect('/campgrounds');
+}));
+
+app.post('/campgrounds/:_id/reviews', validateReview, catchAsync(async (req,res) => {
+    const campgrounds = await Campground.findById(req.params._id);
+    const review = new Review(req.body.review); // Je crée une nouvelle review sur base des attributs name du formulaire dans SHOW.EJS review[body] et review[rating]
+    campgrounds.reviews.push(review); // Je push la review en question dans la liste de review liée à chaque camp.
+    await review.save();  // J'enregistre la review dans la base de donnée.
+    await campgrounds.save(); // J'enregistre l'ajout de la review au campement.
+    res.redirect(`/campgrounds/${campgrounds._id}`)
+}))
+
 
 app.all('*', (req,res,next) => {
     next(new ExpressError('Page Not Found My Boy!', 420))

@@ -14,7 +14,7 @@ db.once("open", () => {
     console.log("Mongo database connected");
 });
 
-const sample = array => array[Math.floor(Math.random() * array.length)]; // Je définis une fonction anonyme qui me permet de générer
+const sample = array => array[Math.floor(Math.random() * array.length)]; // Je définis une fonction qui me permet de générer
                                                                          // Un nombre aléatoire sur base de la longueur du tableau
                                                                          // Ce nombre ne peut donc excéder le nombre d'éléments dudit tableau
 const seedDB = async () => {  // Toujours de l'async/await lorsque je travaille une base de données, ça prend du temps (réelle raison ?).                                          
@@ -27,7 +27,7 @@ const seedDB = async () => {  // Toujours de l'async/await lorsque je travaille 
             title: `${sample(descriptors)} ${sample(places)}`,
             image: 'https://source.unsplash.com/collection/10489597/480x480',
             description : 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam vitae laboriosam molestias!',
-            price
+            price // manière d'écrire price : price
         })
         await camp.save();
     }
@@ -35,5 +35,5 @@ const seedDB = async () => {  // Toujours de l'async/await lorsque je travaille 
 
 seedDB()
 .then(() => {
-    mongoose.connection.close() 
+    mongoose.connection.close();
 });
