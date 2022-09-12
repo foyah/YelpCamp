@@ -14,8 +14,10 @@ const campgroundSchema = new Schema({
         ref : 'Review'
     }]
 });
+// Je crée le schéma qui servira à l'enregistrement des différents camps dans la base de données.
+// Un titre, un prix, une description, la localisation du camp et les avis.
 
-campgroundSchema.post('findOneAndDelete', async function (doc) { // Middleware Mongoose permettant d'effectuer une action après la réponse d'une requête.
+campgroundSchema.post('findOneAndDelete', async function (doc) { // Middleware Mongoose permettant d'effectuer une action après l'exécution du middleware findOneAndDelete().
     if(doc){
         await Review.deleteMany({ 
             _id:{
@@ -26,6 +28,3 @@ campgroundSchema.post('findOneAndDelete', async function (doc) { // Middleware M
 })
 
 module.exports = mongoose.model('Campground', campgroundSchema);
-
-// Je crée le schéma qui servira à l'enregistrement des différents camps dans la base de données.
-// Un titre, un prix, une description et la localisation du camp.

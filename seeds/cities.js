@@ -1,5 +1,5 @@
 // Fichier seed reprenant 1000 villes américaines, ainsi que leur position géographique, la population, l'état.
-// Ainsi qu'un rang, ce qui permet d'itérer facilement dessus.
+
 
 module.exports = [
     {

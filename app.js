@@ -69,7 +69,7 @@ app.get('/campgrounds/new', catchAsync((req, res, next) => {
 // "new" y compris, ce qui donnera une erreur.
 // L'ordre de déclaration compte.
 
-app.post('/campgrounds',validateCampground, catchAsync(async (req,res, next) => { // Route qui me permet de créer les camps via formulaire
+app.post('/campgrounds', validateCampground, catchAsync(async (req,res, next) => { // Route qui me permet de créer les camps via formulaire
     // if(!req.body.campground) throw new ExpressError('Ouille!', 420);
     const campground = new Campground(req.body.campground);
    await campground.save();
